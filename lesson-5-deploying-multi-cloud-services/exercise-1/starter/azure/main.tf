@@ -6,9 +6,9 @@ data "azurerm_resource_group" "example" {
 # Storage Account Configuration
 resource "azurerm_storage_account" "example" {
   name                     = "tscottoudacitystorage"  # Ensure this is unique, lowercase, no spaces or punctuation
-  resource_group_name      = data.azurerm_resource_group.example.name
+  resource_group_name       = data.azurerm_resource_group.example.name
   location                 = data.azurerm_resource_group.example.location
-  account_tier             = "Standard"
+  account_tier              = "Standard"
   account_replication_type = "LRS"
 }
 
@@ -18,8 +18,11 @@ resource "azurerm_service_plan" "example" {
   resource_group_name   = data.azurerm_resource_group.example.name
   location              = data.azurerm_resource_group.example.location
   os_type               = "Windows"  # Specify OS type
-  sku_name              = "S1"       # Specify SKU Name
-  sku_tier              = "Standard" # Specify SKU Tier
+  
+  sku {
+    name = "S1"       # Specify SKU Name
+    tier = "Standard" # Specify SKU Tier
+  }
 }
 
 # Windows Function App Configuration
