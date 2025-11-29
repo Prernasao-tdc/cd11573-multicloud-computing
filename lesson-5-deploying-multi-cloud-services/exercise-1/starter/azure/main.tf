@@ -1,11 +1,11 @@
 # Resource Group Data
 data "azurerm_resource_group" "example" {
-  name = "Regroup_4hEF_2G"  # Replace with your specific resource group name
+  name = "Regroup_4hEF_2G"
 }
 
 # Storage Account Configuration
 resource "azurerm_storage_account" "example" {
-  name                     = "tscottoudacitystorage"  # Must be unique & lowercase
+  name                     = "tscottoudacitystorage"
   resource_group_name      = data.azurerm_resource_group.example.name
   location                 = data.azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -19,7 +19,6 @@ resource "azurerm_service_plan" "example" {
   location            = data.azurerm_resource_group.example.location
   os_type             = "Windows"
 
- 
   sku_name = "S1"
 }
 
@@ -37,9 +36,8 @@ resource "azurerm_windows_function_app" "example" {
   }
 
   site_config {
-    always_on               = true
-    dotnet_framework_version = "v4.0"
-    ftps_state              = "Disabled"
+    always_on  = true
+    ftps_state = "Disabled"
 
     cors {
       allowed_origins = ["*"]
