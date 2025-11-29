@@ -5,7 +5,7 @@ data "azurerm_resource_group" "example" {
 
 # Storage Account Configuration
 resource "azurerm_storage_account" "example" {
-  name                     = "tscottoudacitystorage"  # Ensure this is unique
+  name                     = "tscottoudacitystorage"  # Ensure this is unique, lowercase, and no spaces or punctuation
   resource_group_name      = data.azurerm_resource_group.example.name
   location                 = data.azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -13,29 +13,40 @@ resource "azurerm_storage_account" "example" {
 }
 
 # Service Plan Configuration
-resource "azurerm_service_plan" "example" {
+resource "azurerm_service_plan" "example" {  # Correct resource name
   name                  = "example-app-service-plan"
   resource_group_name   = data.azurerm_resource_group.example.name
   location              = data.azurerm_resource_group.example.location
   os_type               = "Windows"  # Specify OS type
   sku {
-    tier = "Standard"  # Using 'Standard' tier instead of 'Dynamic'
+    tier = "Standard"  # Specify appropriate tier
     size = "S1"        # Adjust size based on your requirements
   }
 }
 
 # Windows Function App Configuration
 resource "azurerm_windows_function_app" "example" {
-  name                       = "tscotto-udacity-windows-function-app"  # Ensure this is unique
+  name                       = "tscottoudacitywindowsfuncapp"  # Ensure this is unique
   resource_group_name        = data.azurerm_resource_group.example.name
   location                   = data.azurerm_resource_group.example.location
   storage_account_name       = azurerm_storage_account.example.name
   storage_account_access_key = azurerm_storage_account.example.primary_access_key
   service_plan_id            = azurerm_service_plan.example.id  # Correct plan reference
-
+  
   identity {
     type = "SystemAssigned"
   }
 
-  site_config {}  # Ensure this block is properly defined without unsupported arguments
+  site_config {
+    always_on = true
+    dotnet_framework_version = "v4.0"
+    ftps_state = "Disabled"
+    cors {
+      allowed_origins = ["*"]
+    }
+  }
+
+  app_settings = {
+    "FUNCTIONS_WORKER_RUNTIME" = "dotnet"
+  }
 }
