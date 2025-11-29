@@ -1,45 +1,41 @@
-# Data block to reference existing resource group
+# Resource Group Data
 data "azurerm_resource_group" "example" {
-  name = "Regroup_4hEF_2G"  # Ensure this is exactly your resource group name in Azure
+  name = "Regroup_4hEF_2G"  # Replace with your specific resource group name
 }
 
-# Storage Account
+# Storage Account Configuration
 resource "azurerm_storage_account" "example" {
-  name                     = "tscottoudacitystorage"  # Must be globally unique
+  name                     = "tscottoudacitystorage"  # Ensure this is unique
   resource_group_name      = data.azurerm_resource_group.example.name
   location                 = data.azurerm_resource_group.example.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
 
-# App Service Plan
-resource "azurerm_app_service_plan" "example" {  # Correct resource name
-  name                = "example-app-service-plan"
-  resource_group_name = data.azurerm_resource_group.example.name
-  location            = data.azurerm_resource_group.example.location
-  kind                = "FunctionApp"  # Specify kind
+# Service Plan Configuration
+resource "azurerm_service_plan" "example" {
+  name                  = "example-app-service-plan"
+  resource_group_name   = data.azurerm_resource_group.example.name
+  location              = data.azurerm_resource_group.example.location
+  os_type               = "Windows"  # Specify OS type
   sku {
-    tier = "Dynamic"  # Specify an appropriate SKU tier and size
-    size = "Y1"
+    tier = "Standard"  # Using 'Standard' tier instead of 'Dynamic'
+    size = "S1"        # Adjust size based on your requirements
   }
 }
 
-# Windows Function App
+# Windows Function App Configuration
 resource "azurerm_windows_function_app" "example" {
-  name                       = "tscotto-udacity-windows-function-app"  # Must be unique
+  name                       = "tscotto-udacity-windows-function-app"  # Ensure this is unique
   resource_group_name        = data.azurerm_resource_group.example.name
   location                   = data.azurerm_resource_group.example.location
-  app_service_plan_id        = azurerm_app_service_plan.example.id
   storage_account_name       = azurerm_storage_account.example.name
   storage_account_access_key = azurerm_storage_account.example.primary_access_key
+  service_plan_id            = azurerm_service_plan.example.id  # Correct plan reference
 
   identity {
     type = "SystemAssigned"
   }
 
-  site_config {
-    app_settings = {
-      "FUNCTIONS_WORKER_RUNTIME" = "dotnet"  # Adjust runtime based on your needs
-    }
-  }
+  site_config {}  # Ensure this block is properly defined without unsupported arguments
 }
